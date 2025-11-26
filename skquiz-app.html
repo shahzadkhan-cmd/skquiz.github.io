@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKQuiz - Test Your Knowledge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Welcome Screen */
+        #welcome-screen {
+            text-align: center;
+        }
+
+        #welcome-screen h1 {
+            color: #667eea;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        #welcome-screen p {
+            color: #555;
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .category-list {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Quiz Screen */
+        #quiz-screen {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            font-size: 1.1em;
+            color: #333;
+            flex: 1;
+        }
+
+        .quiz-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Results Screen */
+        #results-screen {
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .result-message {
+            font-size: 1.8em;
+            color: #333;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .result-details {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            #welcome-screen h1 {
+                font-size: 2em;
+            }
+
+            .question-text {
+                font-size: 1.2em;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-number {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen">
+            <h1>🎯 SKQuiz</h1>
+            <p>Test your knowledge across three exciting categories!</p>
+            <div class="category-list">
+                <span class="category-badge">📚 History</span>
+                <span class="category-badge">💻 Technology</span>
+                <span class="category-badge">🏛️ 7 Wonders</span>
+            </div>
+            <p>Answer 35 carefully crafted questions and prove your expertise!</p>
+            <p>Each question has only one correct answer. Choose wisely!</p>
+            <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="question-counter" id="question-counter"></div>
+            <div class="question-container">
+                <span class="category-tag" id="category-tag"></span>
+                <h2 class="question-text" id="question-text"></h2>
+                <div class="options" id="options-container"></div>
+            </div>
+            <div class="quiz-buttons">
+                <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()">Previous</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">Next</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden">
+            <h1 class="result-message" id="result-message"></h1>
+            <div class="score-circle">
+                <div class="score-number" id="score-number"></div>
+                <div class="score-label">out of 35</div>
+            </div>
+            <div class="result-details">
+                <div class="result-row">
+                    <span>Correct Answers:</span>
+                    <strong id="correct-count"></strong>
+                </div>
+                <div class="result-row">
+                    <span>Wrong Answers:</span>
+                    <strong id="wrong-count"></strong>
+                </div>
+                <div class="result-row">
+                    <span>Percentage:</span>
+                    <strong id="percentage"></strong>
+                </div>
+            </div>
+            <button class="restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // History Questions (12 questions)
+            {
+                category: "History",
+                question: "In which year did World War II end?",
+                options: ["1943", "1945", "1947", "1950"],
+                correct: 1
+            },
+            {
+                category: "History",
+                question: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"],
+                correct: 2
+            },
+            {
+                category: "History",
+                question: "The Roman Empire fell in which year?",
+                options: ["376 AD", "476 AD", "576 AD", "676 AD"],
+                correct: 1
+            },
+            {
+                category: "History",
+                question: "Who discovered America in 1492?",
+                options: ["Ferdinand Magellan", "Vasco da Gama", "Christopher Columbus", "Amerigo Vespucci"],
+                correct: 2
+            },
+            {
+                category: "History",
+                question: "The French Revolution began in which year?",
+                options: ["1776", "1789", "1799", "1804"],
+                correct: 1
+            },
+            {
+                category: "History",
+                question: "Who was the longest-reigning British monarch before Queen Elizabeth II?",
+                options: ["Queen Victoria", "King George III", "King Edward VII", "Queen Mary"],
+                correct: 0
+            },
+            {
+                category: "History",
+                question: "The Berlin Wall fell in which year?",
+                options: ["1987", "1988", "1989", "1990"],
+                correct: 2
+            },
+            {
+                category: "History",
+                question: "Who wrote the Declaration of Independence?",
+                options: ["George Washington", "Benjamin Franklin", "Thomas Jefferson", "John Adams"],
+                correct: 2
+            },
+            {
+                category: "History",
+                question: "The Magna Carta was signed in which year?",
+                options: ["1115", "1215", "1315", "1415"],
+                correct: 1
+            },
+            {
+                category: "History",
+                question: "Which ancient civilization built Machu Picchu?",
+                options: ["Aztecs", "Mayans", "Incas", "Olmecs"],
+                correct: 2
+            },
+            {
+                category: "History",
+                question: "The Cold War was primarily between which two nations?",
+                options: ["USA and China", "USA and USSR", "UK and USSR", "France and Germany"],
+                correct: 1
+            },
+            {
+                category: "History",
+                question: "Who was the first woman to win a Nobel Prize?",
+                options: ["Marie Curie", "Mother Teresa", "Jane Addams", "Bertha von Suttner"],
+                correct: 0
+            },
+
+            // Technology Questions (12 questions)
+            {
+                category: "Technology",
+                question: "Who is considered the father of computers?",
+                options: ["Bill Gates", "Steve Jobs", "Charles Babbage", "Alan Turing"],
+                correct: 2
+            },
+            {
+                category: "Technology",
+                question: "What does HTTP stand for?",
+                options: ["HyperText Transfer Protocol", "High Transfer Text Protocol", "HyperText Transmission Process", "Home Tool Transfer Protocol"],
+                correct: 0
+            },
+            {
+                category: "Technology",
+                question: "In which year was Google founded?",
+                options: ["1996", "1998", "2000", "2002"],
+                correct: 1
+            },
+            {
+                category: "Technology",
+                question: "What is the most popular programming language in 2024?",
+                options: ["Java", "C++", "Python", "JavaScript"],
+                correct: 2
+            },
+            {
+                category: "Technology",
+                question: "Who invented the World Wide Web?",
+                options: ["Bill Gates", "Tim Berners-Lee", "Steve Jobs", "Mark Zuckerberg"],
+                correct: 1
+            },
+            {
+                category: "Technology",
+                question: "What does AI stand for?",
+                options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Internet", "Automatic Integration"],
+                correct: 1
+            },
+            {
+                category: "Technology",
+                question: "Which company developed the first iPhone?",
+                options: ["Samsung", "Nokia", "Apple", "Microsoft"],
+                correct: 2
+            },
+            {
+                category: "Technology",
+                question: "What does CPU stand for?",
+                options: ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Computer Processing Utility"],
+                correct: 0
+            },
+            {
+                category: "Technology",
+                question: "Which programming language is known as the 'mother of all languages'?",
+                options: ["C", "COBOL", "Assembly", "FORTRAN"],
+                correct: 0
+            },
+            {
+                category: "Technology",
+                question: "What year was Facebook launched?",
+                options: ["2002", "2004", "2006", "2008"],
+                correct: 1
+            },
+            {
+                category: "Technology",
+                question: "What does USB stand for?",
+                options: ["Universal Serial Bus", "United System Bus", "Universal System Board", "Unified Serial Board"],
+                correct: 0
+            },
+            {
+                category: "Technology",
+                question: "Who co-founded Microsoft with Bill Gates?",
+                options: ["Steve Wozniak", "Paul Allen", "Larry Page", "Jeff Bezos"],
+                correct: 1
+            },
+
+            // 7 Wonders Questions (11 questions)
+            {
+                category: "7 Wonders",
+                question: "Which is the only remaining ancient wonder of the world?",
+                options: ["Colossus of Rhodes", "Hanging Gardens of Babylon", "Great Pyramid of Giza", "Lighthouse of Alexandria"],
+                correct: 2
+            },
+            {
+                category: "7 Wonders",
+                question: "The Taj Mahal is located in which country?",
+                options: ["Pakistan", "India", "Bangladesh", "Nepal"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "Christ the Redeemer statue is located in which city?",
+                options: ["Buenos Aires", "Lima", "Rio de Janeiro", "São Paulo"],
+                correct: 2
+            },
+            {
+                category: "7 Wonders",
+                question: "Machu Picchu is located in which country?",
+                options: ["Chile", "Peru", "Bolivia", "Ecuador"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "The Great Wall of China is approximately how long?",
+                options: ["5,000 km", "13,000 km", "21,000 km", "30,000 km"],
+                correct: 2
+            },
+            {
+                category: "7 Wonders",
+                question: "Petra is an ancient city carved into rock in which country?",
+                options: ["Egypt", "Jordan", "Syria", "Lebanon"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "The Colosseum is located in which city?",
+                options: ["Athens", "Rome", "Naples", "Venice"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "Chichen Itza was built by which civilization?",
+                options: ["Aztecs", "Mayans", "Incas", "Olmecs"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "In which year were the New Seven Wonders of the World announced?",
+                options: ["2005", "2007", "2009", "2011"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "How tall is Christ the Redeemer statue (including pedestal)?",
+                options: ["28 meters", "38 meters", "48 meters", "58 meters"],
+                correct: 1
+            },
+            {
+                category: "7 Wonders",
+                question: "The Taj Mahal was built by which Mughal Emperor?",
+                options: ["Akbar", "Jahangir", "Shah Jahan", "Aurangzeb"],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let score = 0;
+
+        function startQuiz() {
+            showScreen('quiz-screen');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = quizData[currentQuestion];
+            
+            document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('category-tag').textContent = question.category;
+            document.getElementById('question-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.onclick = () => selectOption(index);
+                
+                const isChecked = userAnswers[currentQuestion] === index;
+                
+                optionDiv.innerHTML = `
+                    <input type="radio" name="answer" id="option${index}" value="${index}" ${isChecked ? 'checked' : ''}>
+                    <label for="option${index}">${option}</label>
+                `;
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            updateProgress();
+            updateButtons();
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestion] = index;
+            const radios = document.querySelectorAll('input[name="answer"]');
+            radios[index].checked = true;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                displayQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.textContent = 'Finish';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+        }
+
+        function finishQuiz() {
+            calculateScore();
+            displayResults();
+        }
+
+        function calculateScore() {
+            score = 0;
+            quizData.forEach((question, index) => {
+                if (userAnswers[index] === question.correct) {
+                    score++;
+                }
+            });
+        }
+
+        function displayResults() {
+            showScreen('results-screen');
+            
+            const percentage = ((score / quizData.length) * 100).toFixed(1);
+            const wrongAnswers = quizData.length - score;
+            
+            document.getElementById('score-number').textContent = score;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('wrong-count').textContent = wrongAnswers;
+            document.getElementById('percentage').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '🏆 Outstanding! Quiz Master!';
+            } else if (percentage >= 75) {
+                message = '🌟 Excellent Work!';
+            } else if (percentage >= 60) {
+                message = '👍 Good Job!';
+            } else if (percentage >= 40) {
+                message = '📚 Keep Learning!';
+            } else {
+                message = '💪 Practice Makes Perfect!';
+            }
+            
+            document.getElementById('result-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            score = 0;
+            showScreen('welcome-screen');
+        }
+
+        function showScreen(screenId) {
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
